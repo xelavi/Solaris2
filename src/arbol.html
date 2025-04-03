@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rete.js visual</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+    #rete {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+
+  <!-- Core y plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/rete@1.4.4/build/rete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rete-connection-plugin@0.9.0/build/connection-plugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rete-context-menu-plugin@0.6.2/build/context-menu-plugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rete-area-plugin@0.2.1/build/area-plugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rete-comment-plugin@0.1.1/build/comment-plugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rete-render-html-plugin@0.2.0/build/html-render-plugin.min.js"></script>
+</head>
+<body>
+  <div id="rete"></div>
+
+  <script>
+    const container = document.getElementById('rete');
+    const numSocket = new Rete.Socket('Number');
+
+    class NumComponent extends Rete.Component {
+      constructor() {
+        super("Número");
+      }
+
+      builder(node) {
+        const ctrl = new Rete.Control(this.editor, 'num', {
+          component: {
+            render: 'html',
+            template: '<input type="number" :value="value" @input="change($event)" />',
+            data() {
+              return {
+                value: 0,
+                change(e) {
+                  this.value = +e.target.value;
+                  node.data.num = this.value;
+                }
+              };
+            }
+          },
+          render: 'html'
+        });
+
+        const out = new Rete.Output('num', "Número", numSocket);
+        return node.addControl(ctrl).addOutput(out);
+      }
+
+      worker(node, inputs, outputs) {
+        outputs['num'] = node.data.num;
+      }
+    }
+
+    class AddComponent extends Rete.Component {
+      constructor() {
+        super("Sumar");
+      }
+
+      builder(node) {
+        const inp1 = new Rete.Input('num1', "Número 1", numSocket);
+        const inp2 = new Rete.Input('num2', "Número 2", numSocket);
+        const out = new Rete.Output('res', "Resultado", numSocket);
+
+        const ctrl = new Rete.Control(this.editor, 'preview', {
+          component: {
+            render: 'html',
+            template: '<div><strong>Resultado:</strong> {{value}}</div>',
+            data() {
+              return {
+                value: 0
+              };
+            }
+          },
+          render: 'html'
+        });
+
+        node.meta.ctrl = ctrl;
+
+        return node.addInput(inp1).addInput(inp2).addControl(ctrl).addOutput(out);
+      }
+
+      worker(node, inputs, outputs) {
+        const n1 = inputs['num1'].length ? inputs['num1'][0] : 0;
+        const n2 = inputs['num2'].length ? inputs['num2'][0] : 0;
+        const sum = n1 + n2;
+
+        outputs['res'] = sum;
+        node.meta.ctrl.component.data().value = sum;
+        node.meta.ctrl.update();
+      }
+    }
+
+    async function main() {
+      const editor = new Rete.NodeEditor('demo@0.1.0', container);
+
+      // Acceder desde window por compatibilidad con los plugins en script tags
+      editor.use(window.ConnectionPlugin);
+      editor.use(window.ContextMenuPlugin);
+      editor.use(window.AreaPlugin);
+      editor.use(window.CommentPlugin);
+      editor.use(window.ReteHtmlRenderPlugin);
+
+      const engine = new Rete.Engine('demo@0.1.0');
+
+      const numComponent = new NumComponent();
+      const addComponent = new AddComponent();
+
+      editor.register(numComponent);
+      editor.register(addComponent);
+      engine.register(numComponent);
+      engine.register(addComponent);
+
+      const n1 = await numComponent.createNode({ num: 5 });
+      const n2 = await numComponent.createNode({ num: 10 });
+      const sum = await addComponent.createNode();
+
+      n1.position = [80, 200];
+      n2.position = [80, 400];
+      sum.position = [400, 300];
+
+      editor.addNode(n1);
+      editor.addNode(n2);
+      editor.addNode(sum);
+
+      editor.connect(n1.outputs.get('num'), sum.inputs.get('num1'));
+      editor.connect(n2.outputs.get('num'), sum.inputs.get('num2'));
+
+      editor.on(['process', 'nodecreated', 'noderemoved', 'connectioncreated', 'connectionremoved'], async () => {
+        await engine.abort();
+        await engine.process(editor.toJSON());
+      });
+
+      await editor.fromJSON(editor.toJSON());
+      editor.view.resize();
+      window.AreaPlugin.zoomAt(editor);
+      editor.trigger('process');
+    }
+
+    main();
+  </script>
+</body>
+</html>

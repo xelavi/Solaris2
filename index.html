@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cytoscape con nodos interactivos</title>
+  <style>
+    #cy {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      background: #f0f0f0;
+    }
+  </style>
+
+  <!-- Cytoscape.js desde CDN -->
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+</head>
+<body>
+  <div id="cy"></div>
+
+  <script>
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+
+      elements: [
+        // NODOS con coordenadas fijas (posición x/y)
+        { data: { id: 'a', label: 'Nodo A' }, position: { x: 100, y: 100 } },
+        { data: { id: 'b', label: 'Nodo B' }, position: { x: 300, y: 100 } },
+        { data: { id: 'c', label: 'Nodo C' }, position: { x: 200, y: 250 } },
+
+        // CONEXIONES
+        { data: { id: 'ab', source: 'a', target: 'b' } },
+        { data: { id: 'bc', source: 'b', target: 'c' } },
+        { data: { id: 'ca', source: 'c', target: 'a' } },
+      ],
+
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(label)',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'background-color': '#61bffc',
+            'shape': 'ellipse',
+            'width': 60,
+            'height': 60,
+            'color': '#000',
+            'font-size': '12px',
+            'border-width': 2,
+            'border-color': '#333',
+            'cursor': 'pointer',
+            'events': 'no'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 2,
+            'line-color': '#999',
+            'target-arrow-shape': 'triangle',
+            'target-arrow-color': '#999',
+            'curve-style': 'bezier'
+          }
+        }
+      ],
+
+      layout: {
+        name: 'preset' // 👈 No usar layout automático
+      }
+    });
+
+    // Evento de click: cambiar color al hacer clic
+    cy.on('tap', 'node', function(evt) {
+      const node = evt.target;
+      const currentColor = node.style('background-color');
+      const newColor = currentColor === 'red' ? '#61bffc' : 'red';
+      node.style('background-color', newColor);
+    });
+  </script>
+</body>
+</html>

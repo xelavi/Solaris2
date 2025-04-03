@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Personaje</title>
+    
+    <script src="components/arbol.js"></script>
+</head>
+<body>
+  <link rel="stylesheet" href="./css/character.css">
+    <main>
+        <div class="container">
+            <h1>Hoja de Personaje</h1>
+            
+            <div class="grid md-grid-cols-2">
+                <!-- Character Info -->
+                <div class="card">
+                  <h2>Información del Personaje</h2>
+                  
+                  <div class="info-grid">
+                      <div class="info-field">
+                          <span class="field-label">Nombre:</span>
+                          <div class="field-value">Aragorn</div>
+                      </div>
+                      
+                      <div class="info-field">
+                          <span class="field-label">Oficio:</span>
+                          <div class="field-value">Montaraz</div>
+                      </div>
+                      
+                      <div class="info-field">
+                          <span class="field-label">Estilo Marcial:</span>
+                          <div class="field-value">Espadachín</div>
+                      </div>
+                      
+                      <div class="info-field">
+                          <span class="field-label">Raza:</span>
+                          <div class="field-value">Humano</div>
+                      </div>
+                      
+                      <div class="info-field">
+                          <span class="field-label">Nivel:</span>
+                          <div class="field-value">8</div>
+                      </div>
+                      
+                      <div class="info-field empty-field">
+                          <span class="field-label">Trasfondo:</span>
+                          <div class="field-value empty">No especificado</div>
+                      </div>
+
+                  </div>
+              </div>
+                
+                <!-- Stats -->
+                <div class="card">
+                    <h2>Estadísticas</h2>
+                    
+                    <div class="grid md-grid-cols-2" style="gap: 1.5rem;">
+                        <!-- Body Stats -->
+                        <div class="stat-section body-stats">
+                            <h3>Body</h3>
+                            <div class="stats-grid">
+                                <div class="stat-label">HP:</div>
+                                <div id="hp" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Resistencia al Daño:</div>
+                                <div id="resistance" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Movimiento:</div>
+                                <div id="movement" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Capacidad de carga:</div>
+                                <div id="cc" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Deadlift:</div>
+                                <div id="deadlift" class="stat-value">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agility Stats -->
+                        <div class="stat-section agility-stats">
+                            <h3>Agility</h3>
+                            <div class="stats-grid">
+                                <div class="stat-label">Dodge:</div>
+                                <div id="dodge" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Iniciativa:</div>
+                                <div id="initiative" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Acciones:</div>
+                                <div id="actions" class="stat-value">-</div>
+                                
+                                <div class="stat-label">Deadeye:</div>
+                                <div id="deadeye" class="stat-value">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- To Hit Stats -->
+                        <div class="stat-section hit-stats md-col-span-2">
+                            <div class="stats-grid">
+                                <div class="stat-label">To hit body:</div>
+                                <div id="toHitB" class="stat-value">-</div>
+                                
+                                <div class="stat-label">To hit agility:</div>
+                                <div id="toHitA" class="stat-value">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md-grid-cols-2">
+                <!-- Skills Grid -->
+                <div class="card">
+                    <div class="skill-header">
+                        <h2 style="margin-bottom: 0;">Árbol de Habilidades</h2>
+                        <div class="skill-points">
+                            <span class="stat-label">Puntos disponibles:</span>
+                            <span id="skillPoint" class="skill-point-count">0</span>
+                        </div>
+                    </div>
+                    <arbol id="myGraph"></arbol>
+                </div>
+                
+                <!-- Actives & Equipment -->
+                <div class="grid grid-rows-2" style="gap: 1.5rem;">
+                    <div class="card">
+                        <h2>Habilidades Activas</h2>
+                        <div class="actives scroll-actives"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Equipo</h2>
+                        <div class="equipment">
+                            <div class="equipment-section">
+                                <h3>Armas:</h3>
+                                <div id="weapons" class="equipment-list"></div>
+                            </div>
+                            <div class="equipment-section">
+                                <h3>Inventario:</h3>
+                                <div id="inventory" class="equipment-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+  // Access the web component
+  const graph = document.getElementById('myGraph');
+  
+  // Listen for events from the graph
+  graph.addEventListener('nodeclick', (event) => {
+    console.log(`Node ${event.detail.nodeId} clicked, new color: ${event.detail.color}`);
+  });
+  
+  graph.addEventListener('graphready', () => {
+    console.log('Graph is ready!');
+    
+    // Example of accessing the Cytoscape instance directly
+    const cy = graph.getGraph();
+    
+    // Example of using the component methods
+    graph.addNode({
+      data: { id: 'd', label: 'Nodo D' },
+      position: { x: 350, y: 250 }
+    });
+    
+    graph.addEdge({
+      id: 'bd', 
+      source: 'b', 
+      target: 'd'
+    });
+  });
+</script>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header y Footer Fijos</title>
+ 
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header fijo arriba -->
+  <header class="top-0 left-0 w-full bg-zinc-800 text-white p-4 shadow z-50">
+    <div class="container mx-auto  ">
+      <nav class="space-x-4">
+        <a href="index.html" class="text-white px-4 py-2 rounded hover:bg-gray-600 transition">Personajes</a>
+        <a href="verPersonaje.html" class="text-white px-4 py-2 rounded hover:bg-gray-600 transition">Nuevo Personaje</a>
+        <a href="arbol.html" class="text-white px-4 py-2 rounded hover:bg-gray-600 transition">Crear Arbol</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="mt-[64px] pb-20 px-4">
+
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      
+      <!-- Card de personaje -->
+      <div class="bg-white shadow rounded overflow-hidden">
+        <img src="../resources/Captura de pantalla 2024-10-23 012803.jpg" alt="Personaje 1" class="w-full h-auto">
+        <div class="p-4 text-center">
+          <h2 class="text-lg font-semibold"><a href="verPersonaje.html" class="px-4 py-2 rounded transition">Personaje 1</a></h2>
+        </div>
+      </div>
+  
+      <div class="bg-white shadow rounded overflow-hidden">
+        <img src="https://via.placeholder.com/300x200" alt="Personaje 2" class="px-4 py-2 rounded hover:bg-gray-600 transition">
+        <div class="p-4 text-center">
+          <h2 class="text-lg font-semibold">Personaje 2</h2>
+        </div>
+      </div>
+  
+      <!-- Puedes duplicar esto para más personajes -->
+  
+    </div>
+  </main>
+
+  <!-- Footer fijo abajo 
+  <footer class="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4 text-center z-50">
+    <p>Footer</p>
+  </footer>-->
+
+</body>
+</html>
