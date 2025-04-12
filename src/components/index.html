@@ -1,109 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Cytoscape Test</title>
+  <meta charset="UTF-8" />
+  <title>Cytoscape JSON Loader</title>
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-    }
-    
+    /* Estilos básicos para el contenedor */
     #cy {
-      width: 800px;
-      height: 600px;
-      display: block;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      margin: 20px 0;
+      width: 100vw;
+      height: 100vh;
+      background: #f4f4f4;
     }
   </style>
-  
-  <!-- Load Cytoscape directly -->
+  <!-- Cargar Cytoscape.js desde CDN -->
   <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 </head>
 <body>
-  <h1>Cytoscape Graph Example</h1>
-  
   <div id="cy"></div>
   
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM loaded, initializing Cytoscape");
-      
-      // Check if cytoscape is loaded
-      if (typeof cytoscape === 'undefined') {
-        console.error("Cytoscape library not loaded!");
-        return;
+    // Se asume que el archivo JSON se llama "cytoscape_converted.json"
+    // y contiene una estructura similar a:
+    // {
+    //   "elements": {
+    //     "nodes": [ { data: { id: 'a', label: 'Nodo A', shape: 'square' }, position: { x: 100, y: 100 } }, ... ],
+    //     "edges": [ { data: { id: 'ab', source: 'a', target: 'b' } }, ... ]
+    //   }
+    // }
+
+    fetch('grafo_completo.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('No se pudo cargar el archivo JSON');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Construimos los nodos y edges por separado
+    const nodes = data.elements.nodes.map(n => ({
+      data: n.data,
+      position:{
+        x:  300 + n.position.x* Math.cos((2 * Math.PI / 3) *  n.position.y),
+        y: 300 + n.position.x* Math.sin((2 * Math.PI / 3)  * n.position.y),
+      } 
+    }));
+
+    const edges = data.elements.edges.map(e => ({
+      data: {
+        id: e.data.id,
+        source: e.data.source,
+        target: e.data.target
       }
-      
-      try {
-        const cy = cytoscape({
-          container: document.getElementById('cy'),
-          
-          elements: [
-            // Nodes
-            { data: { id: 'a', label: 'Nodo A' }, position: { x: 100, y: 100 } },
-            { data: { id: 'b', label: 'Nodo B' }, position: { x: 300, y: 100 } },
-            { data: { id: 'c', label: 'Nodo C' }, position: { x: 200, y: 250 } },
-            
-            // Edges
-            { data: { id: 'ab', source: 'a', target: 'b' } },
-            { data: { id: 'bc', source: 'b', target: 'c' } },
-            { data: { id: 'ca', source: 'c', target: 'a' } },
-          ],
-          
-          style: [
-            {
-              selector: 'node',
-              style: {
-                'label': 'data(label)',
-                'text-valign': 'center',
-                'text-halign': 'center',
-                'background-color': '#61bffc',
-                'shape': 'ellipse',
-                'width': 60,
-                'height': 60,
-                'color': '#000',
-                'font-size': '12px',
-                'border-width': 2,
-                'border-color': '#333',
-                'cursor': 'pointer'
-              }
-            },
-            {
-              selector: 'edge',
-              style: {
-                'width': 2,
-                'line-color': '#999',
-                'target-arrow-shape': 'triangle',
-                'target-arrow-color': '#999',
-                'curve-style': 'bezier'
-              }
-            }
-          ],
-          
-          layout: {
-            name: 'preset'
+    }));
+
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: [...nodes, ...edges], // 👈 Aquí combinamos nodos y edges
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(label)',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'background-color': '#61bffc',
+            'shape': 'data(shape)',
+            'width': 30,
+            'height': 30,
+            'color': '#000',
+            'font-size': '12px',
+            'border-width': 2,
+            'border-color': '#333',
+            'cursor': 'pointer'
           }
-        });
-        
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 2,
+            'line-color': '#999',
+            'curve-style': 'bezier'
+          }
+        }
+      ],
+      layout: {
+        name: 'preset' // Usa las posiciones X/Y del JSON
+      }
+    });
+
         console.log("Cytoscape initialized successfully");
-        
-        // Add click event for nodes
+
+        // Evento de clic para cambiar el color del nodo
         cy.on('tap', 'node', function(evt) {
           const node = evt.target;
+          const position = node.position();
           const currentColor = node.style('background-color');
           const newColor = currentColor === 'red' ? '#61bffc' : 'red';
           node.style('background-color', newColor);
-          console.log(`Node ${node.id()} clicked`);
+          console.log(`Nodo ${node.id()} → posición actual: x=${position.x}, y=${position.y}`);
+         
+          
         });
-        
-      } catch (error) {
+      })
+      .catch(error => {
         console.error("Error initializing Cytoscape:", error);
-      }
-    });
+      });
   </script>
 </body>
 </html>

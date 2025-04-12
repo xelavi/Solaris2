@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hoja de Personaje</title>
-    
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="components/arbol.js"></script>
+    <link rel="stylesheet" href="components/style.css">
 </head>
 <body>
   <link rel="stylesheet" href="./css/character.css">
@@ -120,7 +121,7 @@
                             <span id="skillPoint" class="skill-point-count">0</span>
                         </div>
                     </div>
-                    <arbol id="myGraph"></arbol>
+                    <div id="cy"></div>>
                 </div>
                 
                 <!-- Actives & Equipment -->
@@ -149,31 +150,65 @@
     </main>
 </body>
 <script>
-  // Access the web component
-  const graph = document.getElementById('myGraph');
-  
-  // Listen for events from the graph
-  graph.addEventListener('nodeclick', (event) => {
-    console.log(`Node ${event.detail.nodeId} clicked, new color: ${event.detail.color}`);
-  });
-  
-  graph.addEventListener('graphready', () => {
-    console.log('Graph is ready!');
-    
-    // Example of accessing the Cytoscape instance directly
-    const cy = graph.getGraph();
-    
-    // Example of using the component methods
-    graph.addNode({
-      data: { id: 'd', label: 'Nodo D' },
-      position: { x: 350, y: 250 }
-    });
-    
-    graph.addEdge({
-      id: 'bd', 
-      source: 'b', 
-      target: 'd'
-    });
-  });
-</script>
+   
+    fetch('./components/grafo_completo.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('No se pudo cargar el archivo JSON');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const cy = cytoscape({
+          container: document.getElementById('cy'),
+          elements: data.elements,
+          style: [
+            {
+              selector: 'node',
+              style: {
+                'label': 'data(label)',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                'background-color': '#61bffc',
+                'shape': 'data(shape)', // La forma se extrae del campo data.shape
+                'width': 20,
+                'height': 20,
+                'color': '#000',
+                'font-size': '12px',
+                'border-width': 2,
+                'border-color': '#333',
+                'cursor': 'pointer'
+              }
+            },
+            {
+              selector: 'edge',
+              style: {
+                'width': 2,
+                'line-color': '#999',
+                'target-arrow-shape': 'triangle',
+                'target-arrow-color': '#999',
+                'curve-style': 'bezier'
+              }
+            }
+          ],
+          layout: {
+            name: 'preset' // Usa las posiciones definidas en el JSON
+          }
+        });
+
+        console.log("Cytoscape initialized successfully");
+
+        // Evento de clic para cambiar el color del nodo
+        cy.on('tap', 'node', function(evt) {
+          const node = evt.target;
+          const currentColor = node.style('background-color');
+          const newColor = currentColor === 'red' ? '#61bffc' : 'red';
+          node.style('background-color', newColor);
+          console.log(`Node ${node.id()} clicked`);
+        });
+      })
+      .catch(error => {
+        console.error("Error initializing Cytoscape:", error);
+      });
+  </script>
 </html>

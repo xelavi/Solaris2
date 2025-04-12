@@ -1,0 +1,101 @@
+{
+  "elements": {
+    "nodes": [
+      {
+        "data": {
+          "id": "1",
+          "label": "HEAL",
+          "shape": "square",
+          "active": false
+        },
+        "position": {
+          "x": 480,
+          "y": 120
+        }
+      },
+      {
+        "data": {
+          "id": "2",
+          "label": "HP",
+          "shape": "circle",
+          "active": false
+        },
+        "position": {
+          "x": 600,
+          "y": 120
+        }
+      },
+      {
+        "data": {
+          "id": "3",
+          "label": "ADR",
+          "shape": "square",
+          "active": false
+        },
+        "position": {
+          "x": 780,
+          "y": 120
+        }
+      },
+      {
+        "data": {
+          "id": "4",
+          "label": "M",
+          "shape": "circle",
+          "active": false
+        },
+        "position": {
+          "x": 360,
+          "y": 180
+        }
+      },
+      {
+        "data": {
+          "id": "5",
+          "label": "DL",
+          "shape": "circle",
+          "active": false
+        },
+        "position": {
+          "x": 480,
+          "y": 300
+        }
+      },
+      {
+        "data": {
+          "id": "6",
+          "label": "INTER",
+          "shape": "square",
+          "active": false
+        },
+        "position": {
+          "x": 600,
+          "y": 300
+        }
+      }
+    ],
+    "edges": [
+      {
+        "data": {
+          "id": "202_262",
+          "source": "1",
+          "target": "2"
+        }
+      },
+      {
+        "data": {
+          "id": "162_123",
+          "source": "2",
+          "target": "3"
+        }
+      },
+      {
+        "data": {
+          "id": "205_202",
+          "source": "4",
+          "target": "5"
+        }
+      }
+    ]
+  }
+}
